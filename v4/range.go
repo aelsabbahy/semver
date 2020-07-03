@@ -119,8 +119,23 @@ func ParseRange(s string) (Range, error) {
 	if err != nil {
 		return nil, err
 	}
+	return RangeFromParts(expandedParts)
+}
+
+// ParseRangeWithoutWildCard parses a range and return a Range, but does not support wildcard syntax
+func ParseRangeWithoutWildCard(s string) (Range, error) {
+	parts := splitAndTrim(s)
+	orParts, err := splitORParts(parts)
+	if err != nil {
+		return nil, err
+	}
+	return RangeFromParts(orParts)
+}
+
+// RangeFromParts returns a range from range parts
+func RangeFromParts(parts [][]string) (Range, error) {
 	var orFn Range
-	for _, p := range expandedParts {
+	for _, p := range parts {
 		var andFn Range
 		for _, ap := range p {
 			opStr, vStr, err := splitComparatorVersion(ap)
